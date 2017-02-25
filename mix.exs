@@ -14,7 +14,10 @@ defmodule Alexa.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [
+      applications: [:logger, :httpoison, :timex],
+      mod: {Alexa, []}
+    ]
   end
 
   # Dependencies can be Hex packages:
@@ -31,6 +34,11 @@ defmodule Alexa.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:poison, "~> 2.2.0"}]
+    [
+      {:poison, "~> 2.2.0"},
+      {:httpoison, "~> 0.11.0"},
+      {:timex, "~> 3.0"},
+      {:plug, "~> 1.1"},
+    ]
   end
 end

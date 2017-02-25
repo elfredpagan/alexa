@@ -3,10 +3,6 @@ defmodule Alexa.Controller do
     quote do
       @app_id unquote(opts[:app_id])
 
-      def validate_signature(conn) do
-        conn
-      end
-
       def validate_app_id(conn, app_id) do
         case app_id do
           @app_id ->
@@ -18,11 +14,10 @@ defmodule Alexa.Controller do
         end
       end
 
-      def index(conn, params) do
-        request_body = Poison.Decode.decode params, as: %Alexa.RequestBody{}
+      def index(conn, request_body) do
+        # request_body = Poison.Decode.decode params, as: %Alexa.RequestBody{}
         access_token = request_body.session.user.accessToken
         conn = validate_app_id(conn, request_body.session.application.applicationId)
-        |> validate_signature()
         unless conn.halted do
           conn
           |> handle_auth(request_body.session.user.accessToken)

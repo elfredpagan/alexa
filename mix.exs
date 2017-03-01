@@ -39,6 +39,7 @@ defmodule Alexa.Mixfile do
       {:httpoison, "~> 0.11.0"},
       {:timex, "~> 3.0"},
       {:plug, "~> 1.1"},
+      {:phoenix, "~> 1.2.1"}
     ]
   end
 end

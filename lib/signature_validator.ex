@@ -37,6 +37,7 @@ defmodule Alexa.SignatureValidator do
     case HTTPoison.get(chain_uri) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         certificates = :public_key.pem_decode(body)
+        |> decoded_certs
         validate_certificates(chain_uri, certificates)
       {_, _} ->
         {:error, :no_cert}
@@ -44,7 +45,7 @@ defmodule Alexa.SignatureValidator do
   end
 
   def validate_certificates(_chain_uri, certificates) do
-    decoded_certs(certificates)
+    certificates
     |> valid_chain?
   end
 

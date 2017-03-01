@@ -4,7 +4,7 @@ defmodule Plug.Parsers.ALEXA do
 
   defmodule InvalidAlexaSignatureError do
     @moduledoc """
-    The request will not be processed due to a client error.
+      This request will not be processed due to an invalid signature
     """
 
     defexception message: "invalid signature", plug_status: 403
@@ -16,12 +16,10 @@ defmodule Plug.Parsers.ALEXA do
     if !chain_uri || !signature  do
       {:next, conn}
     else
-      decoder = Keyword.get(opts, :json_decoder) ||
-                    raise ArgumentError, "JSON parser expects a :json_decoder option"
       conn
       |> read_body(opts)
       |> validate_signature(chain_uri, signature)
-      |> decode(decoder)
+      |> decode()
     end
   end
 
@@ -50,16 +48,16 @@ defmodule Plug.Parsers.ALEXA do
     end
   end
 
-  defp decode({:error, :too_large, _conn} = return, _decoder) do
+  defp decode({:error, :too_large, _conn} = return) do
     return
   end
 
-  defp decode({:ok, "", conn}, _decoder) do
+  defp decode({:ok, "", conn}) do
     {:ok, %{}, conn}
   end
 
-  defp decode({:ok, body, conn}, decoder) do
-    case decoder.decode!(body, as: %Alexa.RequestBody{}) do
+  defp decode({:ok, body, conn}) do
+    case Poison.decode!(body, as: %Alexa.RequestBody{}) do
       terms when is_map(terms) ->
         {:ok, terms, conn}
       terms ->

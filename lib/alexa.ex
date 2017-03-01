@@ -1,16 +1,20 @@
 defmodule Alexa do
   use Application
 
-  defmacro alexa(path, controller) do
-    quote do
-      pipeline :alexa do
+  defmacro skill(path, controller, options) do
+    path_atom = String.to_atom(path)
+    quote bind_quoted: [options: options], unquote: true do
+      pipeline unquote(path_atom) do
         plug :accepts, ["json"]
+        plug Alexa.ValidateAppID, app_id: Keyword.get(options, :app_id)
+        plug Alexa.ValidateTimestamp
+        plug Alexa.AuthenticateUser, auth_handler: Keyword.get(options, :auth_handler)
+        plug Alexa.SkillPlug, skill: unquote(controller)
       end
 
-      scope unquote(path), App do
-        pipe_through :alexa
-
-        post "/", unquote(controller), :index
+      scope unquote(path) do
+        pipe_through [unquote(path_atom)]
+        post "/", Alexa.Controller, :index
       end
     end
   end
